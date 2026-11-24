@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة إدارة البوابة (CMS) | المعهد الفني الصناعي بالصحافة</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    body { font-family: 'Cairo', sans-serif; background: #060913; color: #f8fafc; }
+    .tab-btn.active { background: #facc15; color: #060913; }
+  </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8">
+
+  <!-- شاشة تسجيل دخول المسؤول -->
+  <div id="admin-login-view" class="max-w-md mx-auto mt-16 bg-[#0B132B] border border-yellow-400/35 rounded-3xl p-8 shadow-2xl">
+    <div class="text-center space-y-2">
+      <span class="inline-block px-3 py-1 rounded-full bg-yellow-400/15 text-yellow-300 text-xs font-bold">وزارة التعليم العالي</span>
+      <h1 class="text-2xl font-black text-white">لوحة تحكم المعهد (CMS)</h1>
+      <p class="text-xs text-slate-400">المعهد الفني الصناعي بالصحافة</p>
+    </div>
+    <form id="admin-login-form" class="mt-6 space-y-4">
+      <div>
+        <label class="block text-sm font-bold text-yellow-300 mb-1">اسم المستخدم</label>
+        <input id="adm-user" type="text" value="admin" required class="w-full px-4 py-3 rounded-xl bg-[#060913] border border-white/15 text-white focus:border-yellow-400 outline-none" />
+      </div>
+      <div>
+        <label class="block text-sm font-bold text-yellow-300 mb-1">كلمة المرور</label>
+        <input id="adm-pass" type="password" placeholder="Sahafa@2026" required class="w-full px-4 py-3 rounded-xl bg-[#060913] border border-white/15 text-white focus:border-yellow-400 outline-none" />
+      </div>
+      <div id="adm-err" class="hidden p-3 rounded-xl bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-bold text-center"></div>
+      <button type="submit" class="w-full py-3.5 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-black transition-all">دخول لوحة الإدارة</button>
+    </form>
+  </div>
+
+  <!-- لوحة التحكم الرئيسية -->
+  <div id="admin-dashboard-view" class="hidden max-w-6xl mx-auto space-y-6">
+    <header class="flex flex-wrap items-center justify-between gap-4 bg-[#0B132B] border border-yellow-400/35 rounded-3xl p-6 shadow-xl">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-black text-yellow-400">نظام إدارة محتوى البوابة (CMS)</h2>
+        <p class="text-xs sm:text-sm text-slate-300 mt-1">إدارة قاعدة بيانات الطلاب • الجداول الدراسية • الأخبار • المحاضرات PDF</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <span id="stat-students" class="px-3.5 py-2 rounded-xl bg-emerald-500/15 border border-emerald-400/35 text-emerald-300 text-xs font-extrabold">الطلاب: 0</span>
+        <a href="/" target="_blank" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-sm font-bold transition-all">فتح الموقع الرئيسي</a>
+        <button id="adm-logout" class="px-4 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-sm font-bold transition-all">تسجيل خروج</button>
+      </div>
+    </header>
+
+    <!-- أزرار التبويبات -->
+    <div class="flex flex-wrap gap-2 bg-[#0B132B] p-2 rounded-2xl border border-white/10">
+      <button type="button" data-tab="tab-students" class="tab-btn active px-4 py-2.5 rounded-xl text-sm font-extrabold transition-all">إدارة الطلاب وأرقام الجلوس</button>
+      <button type="button" data-tab="tab-schedules" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold text-slate-300 hover:bg-white/5 transition-all">الجداول الدراسية</button>
+      <button type="button" data-tab="tab-news" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold text-slate-300 hover:bg-white/5 transition-all">الأخبار والإعلانات</button>
+      <button type="button" data-tab="tab-lectures" class="tab-btn px-4 py-2.5 rounded-xl text-sm font-extrabold text-slate-300 hover:bg-white/5 transition-all">المحاضرات والمذكرات PDF</button>
+    </div>
+
+    <!-- تبويب 1: إدارة الطلاب -->
+    <section id="tab-students" class="tab-panel bg-[#0B132B] border border-white/10 rounded-3xl p-6 space-y-6">
+      <h3 class="text-lg font-black text-yellow-300">إضافة أو تعديل بيانات طالب</h3>
+      <form id="student-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+        <input id="st-seat" type="text" placeholder="رقم الجلوس (مثال: 6416)" required class="px-4 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm" />
+        <input id="st-name" type="text" placeholder="اسم الطالب بالكامل" required class="px-4 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm lg:col-span-2" />
+        <select id="st-dept" class="px-4 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm">
+          <option value="شبكات وآلات كهربية">شبكات وآلات كهربية</option>
+          <option value="الإلكترونيات">الإلكترونيات</option>
+          <option value="الأجهزة الدقيقة والتحكم">الأجهزة الدقيقة والتحكم</option>
+          <option value="تشغيل المعادن">تشغيل المعادن</option>
+          <option value="التبريد والتكييف">التبريد والتكييف</option>
+          <option value="السيارات">السيارات</option>
+          <option value="الإنشاءات المعمارية">الإنشاءات المعمارية</option>
+        </select>
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-yellow-400 text-slate-950 font-black text-sm">حفظ الطالب</button>
+      </form>
+
+      <div class="pt-4 border-t border-white/10 space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <h4 class="text-sm font-bold text-slate-300">البحث في قاعدة بيانات الطلاب</h4>
+          <input id="st-search" type="text" placeholder="ابحث برقم الجلوس أو الاسم..." class="px-4 py-2 rounded-xl bg-[#060913] border border-white/15 text-sm w-full sm:w-72" />
+        </div>
+        <div id="students-list" class="max-h-96 overflow-y-auto space-y-2 text-sm"></div>
+      </div>
+    </section>
+
+    <!-- تبويب 2: الجداول الدراسية -->
+    <section id="tab-schedules" class="tab-panel hidden bg-[#0B132B] border border-white/10 rounded-3xl p-6 space-y-6">
+      <h3 class="text-lg font-black text-yellow-300">إضافة حصة إلى الجدول الدراسي</h3>
+      <form id="schedule-form" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <select id="sch-day" class="px-3 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm">
+          <option value="sun|الأحد">الأحد</option>
+          <option value="mon|الإثنين">الإثنين</option>
+          <option value="tue|الثلاثاء">الثلاثاء</option>
+          <option value="wed|الأربعاء">الأربعاء</option>
+          <option value="thu|الخميس">الخميس</option>
+        </select>
+        <select id="sch-group" class="px-3 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm">
+          <option value="أ">مجموعة أ</option>
+          <option value="ب">مجموعة ب</option>
+        </select>
+        <input id="sch-subject" type="text" placeholder="اسم المادة" required class="px-3 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm" />
+        <input id="sch-instructor" type="text" placeholder="اسم الدكتور / المهندس" class="px-3 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm" />
+        <input id="sch-room" type="text" placeholder="رقم القاعة / الورشة" class="px-3 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm" />
+        <input id="sch-start" type="number" min="1" max="12" placeholder="رقم الحصة (1 إلى 12)" required class="px-3 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm" />
+        <input id="sch-span" type="number" min="1" max="8" value="2" placeholder="عدد الحصص" required class="px-3 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm" />
+        <button type="submit" class="px-4 py-2.5 rounded-xl bg-yellow-400 text-slate-950 font-black text-sm">إضافة للجدول</button>
+      </form>
+      <div id="schedules-list" class="space-y-2 pt-4 border-t border-white/10 text-sm"></div>
+    </section>
+
+    <!-- تبويب 3: الأخبار والإعلانات -->
+    <section id="tab-news" class="tab-panel hidden bg-[#0B132B] border border-white/10 rounded-3xl p-6 space-y-6">
+      <h3 class="text-lg font-black text-yellow-300">نشر خبر أو إعلان رسمي</h3>
+      <form id="news-form" class="space-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <input id="news-title" type="text" placeholder="عنوان الخبر أو الإعلان" required class="sm:col-span-2 px-4 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm" />
+          <input id="news-cat" type="text" value="إعلان رسمي" placeholder="التصنيف" class="px-4 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm" />
+        </div>
+        <textarea id="news-content" rows="3" placeholder="اكتب نص الخبر أو التنبيه للطلاب هنا..." required class="w-full px-4 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm"></textarea>
+        <button type="submit" class="px-6 py-2.5 rounded-xl bg-yellow-400 text-slate-950 font-black text-sm">نشر الخبر الآن</button>
+      </form>
+      <div id="news-list" class="space-y-2 pt-4 border-t border-white/10 text-sm"></div>
+    </section>
+
+    <!-- تبويب 4: المحاضرات PDF -->
+    <section id="tab-lectures" class="tab-panel hidden bg-[#0B132B] border border-white/10 rounded-3xl p-6 space-y-6">
+      <h3 class="text-lg font-black text-yellow-300">رفع محاضرة أو مذكرة بصيغة PDF</h3>
+      <form id="lecture-form" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <input id="lec-subject" type="text" placeholder="اسم المادة (مثال: تكنولوجيا الورش الميكانيكية)" required class="px-4 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm" />
+        <input id="lec-title" type="text" placeholder="عنوان المحاضرة أو الباب" required class="px-4 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm" />
+        <input id="lec-summary" type="text" placeholder="وصف مختصر للمحتوى" class="px-4 py-2.5 rounded-xl bg-[#060913] border border-white/15 text-sm" />
+        <input id="lec-file" type="file" accept="application/pdf" required class="px-3 py-2 rounded-xl bg-[#060913] border border-white/15 text-xs text-slate-300" />
+        <button type="submit" class="sm:col-span-2 py-3 rounded-xl bg-emerald-400 text-slate-950 font-black text-sm">رفع المحاضرة إلى البوابة</button>
+      </form>
+      <div id="lectures-list" class="space-y-2 pt-4 border-t border-white/10 text-sm"></div>
+    </section>
+  </div>
+
+  <script>
+    let token = localStorage.getItem('sahafa_admin_token');
+    const loginView = document.getElementById('admin-login-view');
+    const dashView = document.getElementById('admin-dashboard-view');
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => {
+          b.classList.remove('active');
+          b.classList.add('text-slate-300');
+        });
+        btn.classList.add('active');
+        btn.classList.remove('text-slate-300');
+        const target = btn.getAttribute('data-tab');
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('hidden', p.id !== target));
+      });
+    });
+
+    function syncAuth() {
+      if (token) {
+        loginView.classList.add('hidden');
+        dashView.classList.remove('hidden');
+        loadData();
+        loadStudents('');
+      } else {
+        loginView.classList.remove('hidden');
+        dashView.classList.add('hidden');
+      }
+    }
+
+    document.getElementById('admin-login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('adm-user').value,
+          password: document.getElementById('adm-pass').value,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        const err = document.getElementById('adm-err');
+        err.textContent = data.error;
+        err.classList.remove('hidden');
+        return;
+      }
+      token = data.token;
+      localStorage.setItem('sahafa_admin_token', token);
+      syncAuth();
+    });
+
+    document.getElementById('adm-logout').addEventListener('click', () => {
+      token = null;
+      localStorage.removeItem('sahafa_admin_token');
+      syncAuth();
+    });
+
+    async function loadStudents(q) {
+      const res = await fetch('/api/admin/students?q=' + encodeURIComponent(q), {
+        headers: { Authorization: 'Bearer ' + token },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      document.getElementById('students-list').innerHTML = data.students.map(s => `
+        <div class="flex flex-wrap justify-between items-center gap-2 bg-[#060913] p-3 rounded-xl border border-white/5">
+          <div>
+            <span class="px-2.5 py-0.5 rounded-lg bg-yellow-400/15 text-yellow-300 font-black ml-2">${s.seat_number}</span>
+            <span class="font-bold text-white">${s.full_name}</span>
+            <span class="text-xs text-slate-400 mr-2">(${s.department})</span>
+          </div>
+          <button onclick="delStudent('${s.seat_number}')" class="text-rose-400 hover:text-rose-300 text-xs font-bold">حذف</button>
+        </div>`).join('');
+    }
+
+    document.getElementById('st-search').addEventListener('input', (e) => loadStudents(e.target.value));
+
+    document.getElementById('student-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await fetch('/api/admin/students', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({
+          seatNumber: document.getElementById('st-seat').value,
+          fullName: document.getElementById('st-name').value,
+          department: document.getElementById('st-dept').value,
+        }),
+      });
+      e.target.reset();
+      loadStudents(document.getElementById('st-search').value);
+      loadData();
+    });
+
+    async function delStudent(seat) {
+      await fetch('/api/admin/students/' + encodeURIComponent(seat), {
+        method: 'DELETE',
+        headers: { Authorization: 'Bearer ' + token },
+      });
+      loadStudents(document.getElementById('st-search').value);
+      loadData();
+    }
+
+    async function loadData() {
+      const res = await fetch('/api/portal-data');
+      const data = await res.json();
+      document.getElementById('stat-students').textContent = 'الطلاب المسجلون: ' + (data.totalStudents || 0);
+
+      document.getElementById('news-list').innerHTML = data.news.map(n => `
+        <div class="flex justify-between items-center bg-[#060913] p-3 rounded-xl">
+          <div>
+            <span class="font-bold text-white">${n.title}</span>
+            <span class="text-xs text-slate-400 mr-2">${n.content}</span>
+          </div>
+          <button onclick="delItem('news', ${n.id})" class="text-rose-400 text-xs font-bold">حذف</button>
+        </div>`).join('');
+
+      document.getElementById('lectures-list').innerHTML = data.lectures.map(l => `
+        <div class="flex justify-between items-center bg-[#060913] p-3 rounded-xl">
+          <div>
+            <span class="font-bold text-emerald-300">${l.subject_name}:</span>
+            <span class="text-white mr-1">${l.title}</span>
+            <a href="${l.file_url}" target="_blank" class="text-xs text-yellow-300 underline mr-2">معاينة PDF</a>
+          </div>
+          <button onclick="delItem('lectures', ${l.id})" class="text-rose-400 text-xs font-bold">حذف</button>
+        </div>`).join('');
+
+      document.getElementById('schedules-list').innerHTML = data.schedules.map(s => `
+        <div class="flex justify-between items-center bg-[#060913] p-3 rounded-xl">
+          <span>${s.day_label} | مجموعة (${s.group_name}) | ${s.subject_title} — ${s.instructor || 'بدون محاضر'} (حصة ${s.start_period})</span>
+          <button onclick="delItem('schedules', ${s.id})" class="text-rose-400 text-xs font-bold">حذف</button>
+        </div>`).join('');
+    }
+
+    async function delItem(type, id) {
+      await fetch(`/api/admin/${type}/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: 'Bearer ' + token },
+      });
+      loadData();
+    }
+
+    document.getElementById('news-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await fetch('/api/admin/news', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({
+          title: document.getElementById('news-title').value,
+          category: document.getElementById('news-cat').value,
+          content: document.getElementById('news-content').value,
+        }),
+      });
+      e.target.reset();
+      loadData();
+    });
+
+    document.getElementById('lecture-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData();
+      fd.append('subjectName', document.getElementById('lec-subject').value);
+      fd.append('title', document.getElementById('lec-title').value);
+      fd.append('summary', document.getElementById('lec-summary').value);
+      fd.append('pdfFile', document.getElementById('lec-file').files[0]);
+      await fetch('/api/admin/lectures', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + token },
+        body: fd,
+      });
+      e.target.reset();
+      loadData();
+    });
+
+    document.getElementById('schedule-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const [dayId, dayLabel] = document.getElementById('sch-day').value.split('|');
+      await fetch('/api/admin/schedules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+        body: JSON.stringify({
+          dayId,
+          dayLabel,
+          groupName: document.getElementById('sch-group').value,
+          subjectTitle: document.getElementById('sch-subject').value,
+          instructor: document.getElementById('sch-instructor').value,
+          room: document.getElementById('sch-room').value,
+          startPeriod: document.getElementById('sch-start').value,
+          spanPeriods: document.getElementById('sch-span').value,
+        }),
+      });
+      e.target.reset();
+      loadData();
+    });
+
+    syncAuth();
+  </script>
+</body>
+</html>
